@@ -1,0 +1,20 @@
+# Environments
+.venv/
+env/
+__pycache__/
+*.py[cod]
+
+# Data and Models 
+# data/raw/*.pdf
+data/processed/*.jsonl
+adapters/
+**/weaviate_data/
+
+# Environment variables / Keys
+.env
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# OS specific
+.DS_Store
