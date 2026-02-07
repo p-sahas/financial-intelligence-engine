@@ -1,0 +1,102 @@
+# LLM Settings
+llm_provider: "openrouter"  # Options: openai | openrouter | groq | gemini | ollama | hf_local
+
+# OpenRouter-specific settings (only used when llm_provider = "openrouter")
+openrouter_provider: "openai"  # Options: openai | google | anthropic | meta | mistral | cohere
+openrouter_model: "gpt-4o-mini"  # Model name without provider prefix
+
+# Direct provider settings (used when llm_provider != "openrouter")
+llm_model: "gpt-4o-mini"  # Model name for direct providers
+
+temperature: 0.2  # Lower for factual RAG, higher (0.7) for conversational
+max_tokens: 384
+request_timeout: 60  # seconds
+
+# Embedding Settings
+text_emb_provider: "sbert"  # Options: openai | cohere | sbert
+text_emb_model: "sentence-transformers/all-MiniLM-L6-v2"  # Or: BAAI/bge-small-en-v1.5
+normalize_embeddings: true
+
+# Image Embedding Settings (for multimodal RAG)
+image_emb_model: "openai/clip-vit-base-patch32"
+clip_model: "clip-ViT-B-32"  # CLIP model for multimodal embeddings
+text_in_clip_space: false  # If true, use CLIP text encoder instead of SBERT
+subset_n: 50  # Small subset size for multimodal demos
+
+# Paths
+artifacts_root: "./artifacts"
+data_root: "./data"
+
+# ChromaDB Settings
+chroma_root: "./artifacts/chroma"
+
+# Chunking Settings
+chunk_size: 800
+chunk_overlap: 150
+
+# Retrieval Settings
+similarity_top_k: 3
+rerank_top_n: 3
+
+# Advanced Retrieval Settings
+bm25_weight: 0.5  # Weight for sparse retrieval in hybrid search
+dense_weight: 0.5  # Weight for dense retrieval in hybrid search
+
+# Model-specific Notes:
+#
+# ==== OpenRouter Models (requires OPENROUTER_API_KEY) ====
+# Set llm_provider: "openrouter" and configure openrouter_provider + openrouter_model
+#
+# OpenAI models (openrouter_provider: "openai"):
+#   - gpt-4o-mini (paid, fast, smart)
+#   - gpt-4o (paid, most capable)
+#   - gpt-3.5-turbo (paid, cheaper)
+#
+# Google models (openrouter_provider: "google"):
+#   - gemini-flash-1.5 (FREE!)
+#   - gemini-pro-1.5 (paid, high quality)
+#   - gemini-flash-1.5-8b (free, smaller)
+#
+# Anthropic models (openrouter_provider: "anthropic"):
+#   - claude-3.5-sonnet (paid, excellent quality)
+#   - claude-3-haiku (paid, fast)
+#   - claude-3-opus (paid, most capable)
+#
+# Meta models (openrouter_provider: "meta-llama"):
+#   - llama-3.2-3b-instruct:free (FREE!)
+#   - llama-3.1-8b-instruct (paid, good balance)
+#   - llama-3.1-70b-instruct (paid, powerful)
+#
+# Mistral models (openrouter_provider: "mistralai"):
+#   - mistral-7b-instruct (paid, efficient)
+#   - mixtral-8x7b-instruct (paid, mixture of experts)
+#   - mistral-large (paid, most capable)
+#
+# Cohere models (openrouter_provider: "cohere"):
+#   - command-r-plus (paid, good for RAG)
+#   - command-r (paid, balanced)
+#
+# Microsoft models (openrouter_provider: "microsoft"):
+#   - phi-3-medium-128k-instruct (paid, long context)
+#
+# ==== Direct Provider Models ====
+#
+# Groq (requires GROQ_API_KEY, llm_provider: "groq"):
+#   - llama-3.1-8b-instant
+#   - llama-3.1-70b-versatile
+#   - mixtral-8x7b-32768
+#
+# Google Direct (requires GOOGLE_API_KEY, llm_provider: "gemini"):
+#   - gemini-1.5-flash
+#   - gemini-1.5-pro
+#
+# OpenAI Direct (requires OPENAI_API_KEY, llm_provider: "openai"):
+#   - gpt-4o-mini
+#   - gpt-4o
+#   - gpt-3.5-turbo
+#
+# ==== Embedding Models ====
+#   - OpenAI: text-embedding-3-small, text-embedding-ada-002
+#   - Cohere: embed-english-v3.0, embed-multilingual-v3.0
+#   - SBERT: sentence-transformers/all-MiniLM-L6-v2, BAAI/bge-small-en-v1.5
+
