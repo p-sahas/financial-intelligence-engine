@@ -2,24 +2,17 @@
 LLM and Embedding Factory Functions
 Centralized factory functions to avoid code duplication across notebooks.
 """
-
 import os
 from typing import Dict, Any
-
 
 # LangChain LLM Factory 
 def get_llm(config: Dict[str, Any]):
     """
-    Return a LangChain-compatible chat model based on config.
-    
+    Return a LangChain-compatible chat model based on confi
     Args:
-        config: Configuration dictionary with llm_provider, llm_model, etc.
-        
+        config: Configuration dictionary with llm_provider, llm_model, etc.   
     Returns:
         LangChain chat model instance
-        
-    Raises:
-        ValueError: If provider is unknown
     """
     provider = config["llm_provider"]
     
@@ -90,15 +83,10 @@ def get_llm(config: Dict[str, Any]):
 def get_text_embeddings(config: Dict[str, Any]):
     """
     Return LangChain embeddings based on config.
-    
     Args:
         config: Configuration dictionary with text_emb_provider, text_emb_model, etc.
-        
     Returns:
         LangChain embeddings instance
-        
-    Raises:
-        ValueError: If provider is unknown
     """
     provider = config["text_emb_provider"]
     model_name = config["text_emb_model"]
@@ -133,10 +121,8 @@ def get_text_embeddings(config: Dict[str, Any]):
 def get_clip_model(config: Dict[str, Any]):
     """
     Return SentenceTransformer CLIP model for image+text embeddings.
-    
     Args:
         config: Configuration dictionary with clip_model setting
-        
     Returns:
         SentenceTransformer CLIP model instance
     """
@@ -149,15 +135,10 @@ def get_clip_model(config: Dict[str, Any]):
 def get_llamaindex_llm(config: Dict[str, Any]):
     """
     Return LlamaIndex LLM based on config.
-    
     Args:
         config: Configuration dictionary with llm_provider, llm_model, etc.
-        
     Returns:
         LlamaIndex LLM instance
-        
-    Raises:
-        ValueError: If provider is unknown
     """
     provider = config["llm_provider"]
     
@@ -261,15 +242,10 @@ def get_llamaindex_llm(config: Dict[str, Any]):
 def get_llamaindex_embeddings(config: Dict[str, Any]):
     """
     Return LlamaIndex embeddings based on config.
-    
     Args:
         config: Configuration dictionary with text_emb_provider, text_emb_model, etc.
-        
     Returns:
         LlamaIndex embeddings instance
-        
-    Raises:
-        ValueError: If provider is unknown
     """
     provider = config["text_emb_provider"]
     model_name = config["text_emb_model"]
@@ -309,10 +285,8 @@ def get_llamaindex_embeddings(config: Dict[str, Any]):
 def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     """
     Load configuration from YAML file.
-    
     Args:
         config_path: Path to config.yaml file
-        
     Returns:
         Configuration dictionary
     """
@@ -335,11 +309,9 @@ def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
 def validate_api_keys(config: Dict[str, Any], verbose: bool = True) -> Dict[str, bool]:
     """
     Check which API keys are available in the environment.
-    
     Args:
         config: Configuration dictionary
         verbose: If True, print warnings for missing keys
-        
     Returns:
         Dictionary mapping key names to availability (True/False)
     """
@@ -365,7 +337,6 @@ def validate_api_keys(config: Dict[str, Any], verbose: bool = True) -> Dict[str,
 def print_config_summary(config: Dict[str, Any]) -> None:
     """
     Print a formatted summary of the configuration.
-    
     Args:
         config: Configuration dictionary
     """
