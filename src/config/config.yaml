@@ -42,6 +42,10 @@ rerank_top_n: 3
 bm25_weight: 0.5  # Weight for sparse retrieval in hybrid search
 dense_weight: 0.5  # Weight for dense retrieval in hybrid search
 
+# Parsing Settings
+parsing_provider: "llama_parse"  # Options: llama_parse | pypdf | pdfplumber
+parsing_mode: "balanced"  # Options: balanced | fast | premium (for LlamaParse)
+
 # Model-specific Notes:
 #
 # ==== OpenRouter Models (requires OPENROUTER_API_KEY) ====

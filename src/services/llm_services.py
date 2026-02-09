@@ -281,6 +281,34 @@ def get_llamaindex_embeddings(config: Dict[str, Any]):
         raise ValueError(f"Unknown embedding provider: {provider}")
 
 
+# Document Parser Factory
+def get_pdf_parser(config: Dict[str, Any]):
+    """
+    Return a parser function or object based on config.
+    """
+    provider = config.get("parsing_provider", "pypdf")
+    
+    if provider == "llama_parse":
+        try:
+            from llama_parse import LlamaParse
+        except ImportError:
+            raise ImportError("llama-parse not installed. Run `pip install llama-parse`.")
+        
+        return LlamaParse(
+            api_key=os.getenv("LLAMA_INDEX_API_KEY"), # User uses this env var
+            result_type="markdown",
+            verbose=True,
+            language="en",
+        )
+            
+    elif provider == "pypdf":
+        from langchain_community.document_loaders import PyPDFLoader
+        return PyPDFLoader
+        
+    else:
+        raise ValueError(f"Unknown parsing provider: {provider}")
+
+
 # Utility Functions
 def load_config(config_path: str = "config.yaml") -> Dict[str, Any]:
     """
@@ -323,8 +351,8 @@ def validate_api_keys(config: Dict[str, Any], verbose: bool = True) -> Dict[str,
         "GROQ_API_KEY": os.getenv("GROQ_API_KEY"),
         "GOOGLE_API_KEY": os.getenv("GOOGLE_API_KEY"),
         "COHERE_API_KEY": os.getenv("COHERE_API_KEY"),
-    }
-    
+        "LLAMA_INDEX_API_KEY": os.getenv("LLAMA_INDEX_API_KEY"),
+    }    
     availability = {}
     for key, value in api_keys.items():
         availability[key] = value is not None
