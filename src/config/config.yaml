@@ -12,6 +12,11 @@ temperature: 0.2  # Lower for factual RAG, higher (0.7) for conversational
 max_tokens: 384
 request_timeout: 60  # seconds
 
+# Fallback Settings (OpenRouter -> Groq)
+enable_fallback: true
+fallback_provider: "groq"
+fallback_model: "llama-3.1-70b-versatile"
+
 # Embedding Settings
 text_emb_provider: "sbert"  # Options: openai | cohere | sbert
 text_emb_model: "sentence-transformers/all-MiniLM-L6-v2"  # Or: BAAI/bge-small-en-v1.5

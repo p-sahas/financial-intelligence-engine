@@ -5,19 +5,38 @@ Centralized factory functions to avoid code duplication across notebooks.
 import os
 from typing import Dict, Any
 
-# LangChain LLM Factory 
 def get_llm(config: Dict[str, Any]):
     """
-    Return a LangChain-compatible chat model based on confi
+    Return a LangChain-compatible chat model based on config.
+    Supports fallback if enable_fallback is True.
     Args:
         config: Configuration dictionary with llm_provider, llm_model, etc.   
     Returns:
-        LangChain chat model instance
+        LangChain chat model instance (potentially with fallbacks)
     """
-    provider = config["llm_provider"]
+    primary_llm = _create_llm_instance(config, config["llm_provider"], config.get("llm_model"))
     
+    if config.get("enable_fallback", False):
+        fallback_provider = config.get("fallback_provider")
+        fallback_model = config.get("fallback_model")
+        
+        if fallback_provider and fallback_model:
+            # Create a localized config for the fallback to avoid mutating the original
+            fallback_config = config.copy()
+            fallback_config["llm_provider"] = fallback_provider
+            fallback_config["llm_model"] = fallback_model
+            
+            secondary_llm = _create_llm_instance(fallback_config, fallback_provider, fallback_model)
+            return primary_llm.with_fallbacks([secondary_llm])
+            
+    return primary_llm
+
+
+def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str):
+    """
+    Internal helper to create a single LLM instance.
+    """
     if provider == "openai":
-        model_name = config["llm_model"]
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             model=model_name,
@@ -30,20 +49,29 @@ def get_llm(config: Dict[str, Any]):
         # Construct full model name: provider/model
         openrouter_provider = config.get("openrouter_provider", "openai")
         openrouter_model = config.get("openrouter_model", "gpt-4o-mini")
-        model_name = f"{openrouter_provider}/{openrouter_model}"
+        # If model_name is passed explicitly (e.g. for fallback), use it, otherwise construct
+        # actually for openrouter primary, we construct it. 
+        # But if this function is called for a fallback that is NOT openrouter, this block won't run.
+        # If fallback IS openrouter, we might need to handle it, but for now fallback is likely Groq.
         
+        # Make sure we use the constructed name only if we define it here, 
+        # but for simplicity let's rely on config if it's the primary.
+        if config.get("llm_provider") == "openrouter" and provider == "openrouter":
+             full_model_name = f"{openrouter_provider}/{openrouter_model}"
+        else:
+             full_model_name = model_name
+
         from langchain_openai import ChatOpenAI
         return ChatOpenAI(
             base_url="https://openrouter.ai/api/v1",
             api_key=os.getenv("OPENROUTER_API_KEY"),
-            model=model_name,
+            model=full_model_name,
             temperature=config["temperature"],
             max_tokens=config["max_tokens"],
             timeout=config["request_timeout"],
         )
     
     elif provider == "groq":
-        model_name = config["llm_model"]
         from langchain_groq import ChatGroq
         return ChatGroq(
             model=model_name,
@@ -53,7 +81,6 @@ def get_llm(config: Dict[str, Any]):
         )
     
     elif provider == "gemini":
-        model_name = config["llm_model"]
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model=model_name,
@@ -62,7 +89,6 @@ def get_llm(config: Dict[str, Any]):
         )
     
     elif provider == "ollama":
-        model_name = config["llm_model"]
         from langchain_community.llms import Ollama
         return Ollama(
             model=model_name,
@@ -307,6 +333,50 @@ def get_pdf_parser(config: Dict[str, Any]):
         
     else:
         raise ValueError(f"Unknown parsing provider: {provider}")
+
+
+def load_pdf_and_save(pdf_path: str, parser: Any, output_dir: str = None) -> str:
+    """
+    Load PDF using the provided parser and save the full text to a markdown file.
+    Args:
+        pdf_path: Path to the PDF file
+        parser: The parser instance (LlamaParse) or class (PyPDFLoader)
+        output_dir: Directory to save the parsed markdown file. If None, uses PDF's parent.
+    Returns:
+        Full text content of the PDF
+    """
+    from pathlib import Path
+    
+    print(f"Loading PDF from: {pdf_path}")
+    
+    # Handle different parser types
+    if hasattr(parser, "load_data"):
+        # LlamaParse
+        documents = parser.load_data(str(pdf_path))
+    else:
+        # PyPDFLoader (LangChain loader class)
+        loader = parser(str(pdf_path))
+        documents = loader.load()
+        
+    print(f"Loaded {len(documents)} pages/documents.")
+    
+    # Combine into full text
+    full_text = "\n\n".join([doc.page_content if hasattr(doc, "page_content") else doc.text for doc in documents])
+    
+    # Save to file
+    pdf_path_obj = Path(pdf_path)
+    if output_dir:
+        out_path = Path(output_dir)
+        out_path.mkdir(parents=True, exist_ok=True)
+        save_path = out_path / f"{pdf_path_obj.stem}_parsed.md"
+    else:
+        save_path = pdf_path_obj.parent / f"{pdf_path_obj.stem}_parsed.md"
+        
+    with open(save_path, "w", encoding="utf-8") as f:
+        f.write(full_text)
+        
+    print(f"Saved parsed content to: {save_path}")
+    return full_text
 
 
 # Utility Functions
