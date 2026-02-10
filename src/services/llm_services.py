@@ -368,14 +368,37 @@ def load_pdf_and_save(pdf_path: str, parser: Any, output_dir: str = None) -> str
     if output_dir:
         out_path = Path(output_dir)
         out_path.mkdir(parents=True, exist_ok=True)
-        save_path = out_path / f"{pdf_path_obj.stem}_parsed.md"
+        save_path_md = out_path / f"{pdf_path_obj.stem}_parsed.md"
+        save_path_json = out_path / f"{pdf_path_obj.stem}_parsed.json"
     else:
-        save_path = pdf_path_obj.parent / f"{pdf_path_obj.stem}_parsed.md"
+        save_path_md = pdf_path_obj.parent / f"{pdf_path_obj.stem}_parsed.md"
+        save_path_json = pdf_path_obj.parent / f"{pdf_path_obj.stem}_parsed.json"
         
-    with open(save_path, "w", encoding="utf-8") as f:
+    # Save Markdown
+    with open(save_path_md, "w", encoding="utf-8") as f:
         f.write(full_text)
+    print(f"Saved parsed Markdown to: {save_path_md}")
+
+    # Save JSON (List of dicts)
+    # Convert documents to serializable format
+    json_docs = []
+    for doc in documents:
+        if hasattr(doc, "to_dict"):
+            # LlamaIndex Document
+            json_docs.append(doc.to_dict())
+        elif hasattr(doc, "dict"):
+            # Pydantic via Langchain
+            json_docs.append(doc.dict())
+        else:
+            # Fallback
+            content = doc.page_content if hasattr(doc, "page_content") else doc.text
+            metadata = doc.metadata if hasattr(doc, "metadata") else {}
+            json_docs.append({"text": content, "metadata": metadata})
+
+    with open(save_path_json, "w", encoding="utf-8") as f:
+        json.dump(json_docs, f, indent=2, default=str)
         
-    print(f"Saved parsed content to: {save_path}")
+    print(f"Saved parsed JSON to: {save_path_json}")
     return full_text
 
 
