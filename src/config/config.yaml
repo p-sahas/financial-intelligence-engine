@@ -17,6 +17,23 @@ enable_fallback: true
 fallback_provider: "groq"
 fallback_model: "llama-3.1-70b-versatile"
 
+# Task-Specific LLM Settings (Overrides global defaults if set)
+question_generation:
+  llm_provider: "groq"
+  llm_model: "llama-3.3-70b-versatile"
+  enable_fallback: true
+  fallback_provider: "openrouter"
+  fallback_model: "gpt-4o-mini"
+  temperature: 0.7  # Higher creativity for questions
+
+answer_generation:
+  llm_provider: "groq"
+  llm_model: "llama-3.1-8b-instant"  # Faster/Cheaper for answers
+  enable_fallback: true
+  fallback_provider: "openrouter"
+  fallback_model: "gpt-4o-mini"
+  temperature: 0.1  # Strict factual adherence
+
 # Embedding Settings
 text_emb_provider: "sbert"  # Options: openai | cohere | sbert
 text_emb_model: "sentence-transformers/all-MiniLM-L6-v2"  # Or: BAAI/bge-small-en-v1.5
