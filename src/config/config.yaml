@@ -1,12 +1,12 @@
 # LLM Settings
-llm_provider: "openrouter"  # Options: openai | openrouter | groq | gemini | ollama | hf_local
+llm_provider: "groq"  # Options: openai | openrouter | groq | gemini | ollama | hf_local
 
 # OpenRouter-specific settings (only used when llm_provider = "openrouter")
 openrouter_provider: "openai"  # Options: openai | google | anthropic | meta | mistral | cohere
 openrouter_model: "gpt-4o-mini"  # Model name without provider prefix
 
 # Direct provider settings (used when llm_provider != "openrouter")
-llm_model: "gpt-4o-mini"  # Model name for direct providers
+llm_model: "llama-3.3-70b-versatile"  # Model name for direct providers
 
 temperature: 0.2  # Lower for factual RAG, higher (0.7) for conversational
 max_tokens: 384
