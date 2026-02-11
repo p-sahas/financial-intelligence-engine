@@ -346,6 +346,7 @@ def load_pdf_and_save(pdf_path: str, parser: Any, output_dir: str = None) -> str
         Full text content of the PDF
     """
     from pathlib import Path
+    import json
     
     print(f"Loading PDF from: {pdf_path}")
     
