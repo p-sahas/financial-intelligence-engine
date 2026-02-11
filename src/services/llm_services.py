@@ -41,8 +41,8 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
         return ChatOpenAI(
             model=model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
-            timeout=config["request_timeout"],
+            max_tokens=config.get("max_tokens", 512),
+            timeout=config.get("request_timeout", 60),
         )
     
     elif provider == "openrouter":
@@ -67,8 +67,8 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
             api_key=os.getenv("OPENROUTER_API_KEY"),
             model=full_model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
-            timeout=config["request_timeout"],
+            max_tokens=config.get("max_tokens", 512),
+            timeout=config.get("request_timeout", 60),
         )
     
     elif provider == "groq":
@@ -76,8 +76,8 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
         return ChatGroq(
             model=model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
-            timeout=config["request_timeout"],
+            max_tokens=config.get("max_tokens", 512),
+            timeout=config.get("request_timeout", 60),
         )
     
     elif provider == "gemini":
@@ -85,7 +85,7 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
         return ChatGoogleGenerativeAI(
             model=model_name,
             temperature=config["temperature"],
-            max_output_tokens=config["max_tokens"],
+            max_output_tokens=config.get("max_tokens", 512),
         )
     
     elif provider == "ollama":
@@ -178,7 +178,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
         return OpenAI(
             model=model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
+            max_tokens=config.get("max_tokens", 512),
         )
     
     elif provider == "openrouter":
@@ -198,7 +198,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
                 api_key=os.getenv("OPENROUTER_API_KEY"),
                 model=model_name,
                 temperature=config["temperature"],
-                max_tokens=config["max_tokens"],
+                max_tokens=config.get("max_tokens", 512),
                 is_chat_model=True,
             )
         except ImportError:
@@ -211,7 +211,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
                     api_key=os.getenv("OPENROUTER_API_KEY"),
                     model=model_name,
                     temperature=config["temperature"],
-                    max_tokens=config["max_tokens"],
+                    max_tokens=config.get("max_tokens", 512),
                     is_chat_model=True,
                 )
             except ImportError:
@@ -223,7 +223,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
                     api_key=os.getenv("OPENROUTER_API_KEY"),
                     model=model_name,
                     temperature=config["temperature"],
-                    max_tokens=config["max_tokens"],
+                    max_tokens=config.get("max_tokens", 512),
                 )
     
     elif provider == "groq":
@@ -236,7 +236,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
         return Groq(
             model=model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
+            max_tokens=config.get("max_tokens", 512),
         )
     
     elif provider == "gemini":
@@ -259,7 +259,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
         lc_llm = ChatOpenAI(
             model=model_name,
             temperature=config["temperature"],
-            max_tokens=config["max_tokens"],
+            max_tokens=config.get("max_tokens", 512),
         )
         return LangChainLLM(llm=lc_llm)
 

@@ -25,6 +25,8 @@ question_generation:
   fallback_provider: "openrouter"
   fallback_model: "gpt-4o-mini"
   temperature: 0.7  # Higher creativity for questions
+  max_tokens: 1024
+  request_timeout: 60
 
 answer_generation:
   llm_provider: "groq"
@@ -33,6 +35,8 @@ answer_generation:
   fallback_provider: "openrouter"
   fallback_model: "gpt-4o-mini"
   temperature: 0.1  # Strict factual adherence
+  max_tokens: 512
+  request_timeout: 60
 
 # Embedding Settings
 text_emb_provider: "sbert"  # Options: openai | cohere | sbert
