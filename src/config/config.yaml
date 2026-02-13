@@ -12,6 +12,26 @@ temperature: 0.2  # Lower for factual RAG, higher (0.7) for conversational
 max_tokens: 384
 request_timeout: 30  # seconds
 
+# RAG & Vector DB Settings
+vector_db:
+  collection_name: "AdvancedDense"
+  safe_keys:
+    - "source"
+    - "page_number"
+    - "category"
+    - "text_as_html"
+
+rerank_settings:
+  model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
+  fusion_k: 60  # RRF constant
+  final_k: 5    # Top-K after reranking
+
+# Data Paths (Relative to project root)
+chunks_json_path: "data/processed/qa_dataset_full.json" # Corrected to point to processed data
+golden_test_set_path: "data/processed/golden_test_set.jsonl"
+eval_results_path: "data/results/rag_evaluation_results.json"
+
+
 # Fallback Settings (OpenRouter -> Groq)
 enable_fallback: true
 fallback_provider: "groq"
