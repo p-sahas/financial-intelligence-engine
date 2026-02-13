@@ -10,7 +10,7 @@ llm_model: "llama-3.3-70b-versatile"  # Model name for direct providers
 
 temperature: 0.2  # Lower for factual RAG, higher (0.7) for conversational
 max_tokens: 384
-request_timeout: 60  # seconds
+request_timeout: 30  # seconds
 
 # Fallback Settings (OpenRouter -> Groq)
 enable_fallback: true
@@ -19,18 +19,18 @@ fallback_model: "llama-3.1-70b-versatile"
 
 # Task-Specific LLM Settings (Overrides global defaults if set)
 question_generation:
-  llm_provider: "groq"
-  llm_model: "llama-3.3-70b-versatile"
+  llm_provider: "gemini"
+  llm_model: "gemini-2.5-flash"
   enable_fallback: true
   fallback_provider: "openrouter"
   fallback_model: "gpt-4o-mini"
   temperature: 0.7  # Higher creativity for questions
   max_tokens: 1024
-  request_timeout: 60
+  request_timeout: 30
 
 answer_generation:
   llm_provider: "groq"
-  llm_model: "llama-3.1-8b-instant"  # Faster/Cheaper for answers
+  llm_model: "openai/gpt-oss-20b"  # Faster/Cheaper for answers
   enable_fallback: true
   fallback_provider: "openrouter"
   fallback_model: "gpt-4o-mini"
