@@ -17,17 +17,49 @@ def get_llm(config: Dict[str, Any]):
     primary_llm = _create_llm_instance(config, config["llm_provider"], config.get("llm_model"))
     
     if config.get("enable_fallback", False):
-        fallback_provider = config.get("fallback_provider")
-        fallback_model = config.get("fallback_model")
+        fallback_llms = []
         
-        if fallback_provider and fallback_model:
-            # Create a localized config for the fallback to avoid mutating the original
+        # 1. Check for list of fallbacks (Robust Multi-Provider)
+        if "fallbacks" in config and isinstance(config["fallbacks"], list):
+            for fb_cfg in config["fallbacks"]:
+                # Create a localized config for the fallback
+                temp_config = config.copy()
+                # Override keys from the fallback config (e.g., llm_provider, llm_model, api_key_name)
+                temp_config.update(fb_cfg)
+                
+                # Ensure provider and model are set for the instance creation
+                fb_provider = temp_config.get("llm_provider") or temp_config.get("provider")
+                fb_model = temp_config.get("llm_model") or temp_config.get("model")
+                
+                if fb_provider and fb_model:
+                     # Map 'provider' back to 'llm_provider' if needed by _create_llm_instance
+                    temp_config["llm_provider"] = fb_provider
+                    try:
+                        fb_llm = _create_llm_instance(temp_config, fb_provider, fb_model)
+                        fallback_llms.append(fb_llm)
+                    except Exception as e:
+                        print(f"Warning: Could not initialize fallback {fb_provider}/{fb_model}: {e}")
+
+        # 2. Check for single fallback (Legacy/Simple)
+        elif config.get("fallback_provider") and config.get("fallback_model"):
+            fallback_provider = config.get("fallback_provider")
+            fallback_model = config.get("fallback_model")
+            
             fallback_config = config.copy()
             fallback_config["llm_provider"] = fallback_provider
             fallback_config["llm_model"] = fallback_model
             
-            secondary_llm = _create_llm_instance(fallback_config, fallback_provider, fallback_model)
-            return primary_llm.with_fallbacks([secondary_llm])
+            try:
+                secondary_llm = _create_llm_instance(fallback_config, fallback_provider, fallback_model)
+                fallback_llms.append(secondary_llm)
+            except Exception as e:
+                print(f"Warning: Could not initialize fallback {fallback_provider}: {e}")
+        
+        # 3. Attach Fallbacks
+        if fallback_llms:
+            # We catch Exception to handle RateLimit, AuthError, Timeout, etc.
+            # This ensures specific errors like "quota limits" or "key deleted" trigger the fallback.
+            return primary_llm.with_fallbacks(fallback_llms, exceptions_to_handle=(Exception,))
             
     return primary_llm
 
@@ -42,7 +74,7 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
             model=model_name,
             temperature=config["temperature"],
             max_tokens=config.get("max_tokens", 512),
-            timeout=config.get("request_timeout", 60),
+            timeout=config.get("request_timeout", 30),
         )
     
     elif provider == "openrouter":
@@ -68,7 +100,7 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
             model=full_model_name,
             temperature=config["temperature"],
             max_tokens=config.get("max_tokens", 512),
-            timeout=config.get("request_timeout", 60),
+            timeout=config.get("request_timeout", 30),
         )
     
     elif provider == "groq":
@@ -77,7 +109,7 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
             model=model_name,
             temperature=config["temperature"],
             max_tokens=config.get("max_tokens", 512),
-            timeout=config.get("request_timeout", 60),
+            timeout=config.get("request_timeout", 30),
         )
     
     elif provider == "gemini":
