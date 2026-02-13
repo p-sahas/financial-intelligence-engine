@@ -38,7 +38,16 @@ def get_accurate_cost(sources: List[Dict], query: str, answer: str, prompt_templ
     for s in sources:
         # Handle both dict and object formats
         if isinstance(s, dict):
-            content = s.get('doc', {}).page_content if isinstance(s.get('doc'), object) else s.get('page_content', '')
+            # Check if 'doc' key exists and is an object with page_content
+            doc = s.get('doc')
+            if doc and hasattr(doc, 'page_content'):
+                 content = doc.page_content
+            # Check if 'doc' is a dict with page_content
+            elif isinstance(doc, dict):
+                 content = doc.get('page_content', '')
+            # Fallback to direct key access
+            else:
+                 content = s.get('page_content', '')
         else:
             content = s.page_content if hasattr(s, 'page_content') else str(s)
         context_parts.append(content)
