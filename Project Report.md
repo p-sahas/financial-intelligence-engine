@@ -1,8 +1,8 @@
 # Engineering Report: Comparative Evaluation of Hybrid RAG Architecture for Financial Document Intelligence
 
-**Date:** February 14, 2026  
-**Author:** Sahas Induwara  
-**Student Number:** 0200  
+**Date:** February 14, 2026
+**Author:** Sahas Induwara
+**Student Number:** 0200
 **Subject:** Technical Assessment of Retrieval-Augmented Generation (RAG) vs. Fine-Tuned LLM in Financial Contexts
 
 ---
@@ -42,7 +42,7 @@ A curated dataset was extracted from Uber Technologies Inc. Annual Reports (2019
 
 | Feature                | Configuration A: Hybrid RAG ("Librarian")                                    | Configuration B: Baseline LLM ("Intern")                     |
 | :--------------------- | :--------------------------------------------------------------------------- | :----------------------------------------------------------- |
-| **Model**              | `gemini-1.5-flash` (Temperature: 0.2)                                        | `gpt-4o-mini` (Temperature: 0.1)                             |
+| **Model**              | llama-3.1-70b-versatile                                                      | unsloth/Meta-Llama-3.1-8B-Instruct                           |
 | **Knowledge Source**   | **External Vector Database** (Weaviate) containing specific document chunks. | **Internal Parametric Memory** only (pre-trained knowledge). |
 | **Retrieval Strategy** | Hybrid Search (Sparse BM25 + Dense Vector).                                  | N/A (Direct generation).                                     |
 | **Reranking**          | Cross-Encoder (`ms-marco-MiniLM-L-6-v2`) used to rank top 5 chunks.          | N/A.                                                         |
@@ -57,11 +57,11 @@ The performance of both systems was measured across four key metrics.
 ### 3.1 Performance Metrics Table
 
 | Metric                     | Hybrid RAG | Baseline LLM | Delta     | Interpretation                                                                                  |
-| :------------------------- | :--------- | :----------- | :-------- | :---------------------------------------------------------------------------------------------- |
+| :------------------------- | :--------- | :----------- | :-------- | :---------------------------------------------------------------------------------------------- | --- |
 | **Avg. Judge Score (1-5)** | **3.83**   | 3.50         | +0.33     | RAG answers are consistently rated higher for accuracy and completeness by the LLM Judge.       |
 | **Avg. ROUGE-L Score**     | **0.35**   | 0.16         | +0.19     | RAG answers share significantly more vocabulary (exact numbers/phrasing) with the Ground Truth. |
 | **Avg. Latency**           | 13.92s     | **4.79s**    | +9.13s    | The retrieval and reranking steps introduce a necessary processing overhead.                    |
-| **Avg. Cost per Query**    | $0.00019   | **$0.00014** | +$0.00005 | RAG incurs slightly higher token costs due to injecting retrieved context into the prompt.      |
+| **Avg. Cost per Query**    | $0.00019   | **$0.00014** | +$0.00005 | RAG incurs slightly higher token costs due to injecting retrieved context into the prompt.      |     |
 
 **Analysis:**
 The significant advantage in **ROUGE-L (Recall-Oriented Understudy for Gisting Evaluation)** for the RAG system confirms its superiority in retrieving precise terminology and figures. The Baseline model, while fluent, tends to paraphrase or generalize, resulting in lower lexical overlap with the verified ground truth. The latency increase is linear with the number of retrieved chunks but remains within acceptable bounds for analytical tools.
@@ -134,9 +134,9 @@ Based on the empirical evidence presented, the **Hybrid RAG architecture is reco
 
 To further enhance reliability and usability, the following improvements are proposed:
 
-1.  **Metadata Pre-filtering:** Restricting search scope by year (e.g., `WHERE year = '2023'`) to prevent data contamination across reporting periods.
-2.  **Specialized Tabular Parsing:** Integrating visual document understanding models (e.g., LlamaParse) to better interpret complex financial tables, which are often poorly represented in plain text.
-3.  **Agentic Routing:** Implementing a routing layer to direct general queries to a cheaper model and complex financial queries to the RAG pipeline, optimizing cost-efficiency.
+1. **Metadata Pre-filtering:** Restricting search scope by year (e.g., `WHERE year = '2023'`) to prevent data contamination across reporting periods.
+2. **Specialized Tabular Parsing:** Integrating visual document understanding models (e.g., LlamaParse) to better interpret complex financial tables, which are often poorly represented in plain text.
+3. **Agentic Routing:** Implementing a routing layer to direct general queries to a cheaper model and complex financial queries to the RAG pipeline, optimizing cost-efficiency.
 
 ---
 
