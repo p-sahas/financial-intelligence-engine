@@ -112,7 +112,7 @@ def _create_llm_instance(config: Dict[str, Any], provider: str, model_name: str)
             timeout=config.get("request_timeout", 30),
         )
     
-    elif provider == "gemini":
+    elif provider == "gemini" or provider == "google":
         from langchain_google_genai import ChatGoogleGenerativeAI
         return ChatGoogleGenerativeAI(
             model=model_name,
@@ -271,7 +271,7 @@ def get_llamaindex_llm(config: Dict[str, Any]):
             max_tokens=config.get("max_tokens", 512),
         )
     
-    elif provider == "gemini":
+    elif provider == "gemini" or provider == "google":
         model_name = config["llm_model"]
         try:
             from llama_index_llms_gemini import Gemini
@@ -550,4 +550,3 @@ if __name__ == "__main__":
         print(f" LangChain embeddings failed: {e}")
     
     print("\n All services initialized successfully!")
-
