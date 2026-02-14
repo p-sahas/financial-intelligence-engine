@@ -14,7 +14,7 @@ request_timeout: 30  # seconds
 
 # RAG & Vector DB Settings
 vector_db:
-  collection_name: "AdvancedDense"
+  collection_name: "FinancialReport"
   safe_keys:
     - "source"
     - "page_number"
